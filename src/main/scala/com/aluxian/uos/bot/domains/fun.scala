@@ -28,6 +28,9 @@ object FunResponses extends ResponseGenerator {
   def turtles(): String = {
     s"https://www.youtube.com/watch?v=CMNry4PE93Y"
   }
+  def cutest(): String = {
+    s"That's an easy question! Its Aysel! If you are Aysel, go to that coffee, I mean tea, it will be awesome! Catpromise!"
+  }
   def sotonrocks(): String = {
     s"University of Southampton is the best universtiy ever! Take that Solent!"
   }
@@ -45,7 +48,8 @@ object FunStory extends Story {
     "Is Southampton better than Portsmouth?" \\ EntityDef.Intent.GetPompey,
     "What do you think of Solent University?" \\ EntityDef.Intent.GetSolent,
     "What is love?" \\ EntityDef.Intent.GetLove,
-    "Do you like turtles?" \\ EntityDef.Intent.GetTurtles
+    "Do you like turtles?" \\ EntityDef.Intent.GetTurtles,
+    "Who's the cutest girl ever?" \\ EntityDef.Intent.GetCutest
   )
 
   def analyse(past: BotPast, bot: BotInterface): Boolean = {
@@ -55,7 +59,8 @@ object FunStory extends Story {
       past.userAsked(Intent("get_pompey")) ||
       past.userAsked(Intent("get_solent")) ||
       past.userAsked(Intent("get_love")) ||
-      past.userAsked(Intent("get_turtles"))
+      past.userAsked(Intent("get_turtles")) ||
+      past.userAsked(Intent("get_cutest"))
   }
 
   def run(past: BotPast, bot: BotInterface): Future[List[BotAction]] = {
@@ -76,6 +81,8 @@ object FunStory extends Story {
         return Future(List(Respond(TextBotResponse(FunResponses.love()))))
       } else if (intent equals Intent("get_turtles")) {
         return Future(List(Respond(TextBotResponse(FunResponses.turtles()))))
+      } else if (intent equals Intent("get_cutest")) {
+        return Future(List(Respond(TextBotResponse(FunResponses.cutest()))))
       }
     }
 
