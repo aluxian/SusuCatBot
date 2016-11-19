@@ -2,7 +2,7 @@ package com.aluxian.uos.bot.ai
 
 import com.aluxian.uos.bot.Story
 import com.aluxian.uos.bot.apis.WitAiApi
-import com.aluxian.uos.bot.domains.{AroundCampusStory, FunStory, GeneralStory, WeatherStory}
+import com.aluxian.uos.bot.domains._
 import com.aluxian.uos.bot.models.{BotAction, Entity, PastMessage, _}
 import com.aluxian.uos.bot.mongo.MongoMessage
 import com.twitter.util.Future
@@ -51,7 +51,8 @@ class Bot(val data: MongoData) {
       (WeatherStory, WeatherStory.analyse(botPast, botInterface)),
       (FunStory, FunStory.analyse(botPast, botInterface)),
       (GeneralStory, GeneralStory.analyse(botPast, botInterface)),
-      (AroundCampusStory, AroundCampusStory.analyse(botPast, botInterface))
+      (AroundCampusStory, AroundCampusStory.analyse(botPast, botInterface)),
+      (MySotonStory, MySotonStory.analyse(botPast, botInterface))
     )
       .find(_._2)
       .map(_._1)

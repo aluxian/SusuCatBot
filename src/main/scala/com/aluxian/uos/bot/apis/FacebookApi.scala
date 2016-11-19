@@ -1,7 +1,7 @@
 package com.aluxian.uos.bot.apis
 
 import com.aluxian.uos.bot.config.Config
-import com.aluxian.uos.bot.models.{AddressedFacebookAction, AddressedFacebookMessage, FacebookUser}
+import com.aluxian.uos.bot.models.{AddressedFacebookAction, AddressedFacebookMessage, FacebookUser, ImageMessage}
 import com.twitter.util.{Future, FuturePool}
 import io.circe.generic.auto._
 import io.circe.parser._
@@ -45,5 +45,9 @@ object FacebookApi {
     post(addressedFacebookAction.asJson.noSpaces)
 
   def postMessage(addressedFacebookMessage: AddressedFacebookMessage): Future[Unit] =
-    post(addressedFacebookMessage.toAlt.asJson.noSpaces)
+    if (addressedFacebookMessage.message.isInstanceOf[ImageMessage]) {
+      post(addressedFacebookMessage.toAlt2.asJson.noSpaces)
+    } else {
+      post(addressedFacebookMessage.toAlt.asJson.noSpaces)
+    }
 }

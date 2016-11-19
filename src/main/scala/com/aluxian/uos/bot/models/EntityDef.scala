@@ -29,6 +29,10 @@ object EntityDef {
     case object GetEat extends DefType("get_eat")
     case object GetBathroom extends DefType("get_bathroom")
     case object GetBeer extends DefType("get_beer")
+
+    case object GetMail extends DefType("get_mail")
+    case object GetCoursework extends DefType("get_coursework")
+    case object GetMap extends DefType("get_map")
   }
 }
 
