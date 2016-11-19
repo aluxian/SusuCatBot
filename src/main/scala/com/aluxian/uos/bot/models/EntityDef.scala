@@ -23,6 +23,7 @@ object EntityDef {
     case object ThankYou extends DefType("thank_you")
     case object Insult extends DefType("insult")
     case object Meow extends DefType("meow")
+    case object FavThing extends DefType("fav_thing")
   }
 }
 

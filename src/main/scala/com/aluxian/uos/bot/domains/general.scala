@@ -42,6 +42,14 @@ object GeneralResponses extends ResponseGenerator {
       "Meeeeooooooooooow \uD83D\uDE3D"
     )
   }
+
+  def favThing(): String = {
+    random(
+      "Sleeeeping \uD83D\uDE34",
+      "Eating fish \uD83D\uDC20",
+      "Getting stroked by students \uD83E\uDD17"
+    )
+  }
 }
 
 object GeneralActions {
@@ -54,7 +62,8 @@ object GeneralStory extends Story {
     "how are you?" \\ EntityDef.Intent.HowAreYou,
     "thank you" \\ EntityDef.Intent.ThankYou,
     "fuck you" \\ EntityDef.Intent.Insult,
-    "meow for me" \\ EntityDef.Intent.Meow
+    "meow for me" \\ EntityDef.Intent.Meow,
+    "What's your favourite thing to do?" \\ EntityDef.Intent.FavThing
   )
 
   def analyse(past: BotPast, bot: BotInterface): Boolean = {
@@ -75,6 +84,8 @@ object GeneralStory extends Story {
         List(Respond(TextBotResponse(GeneralResponses.insult())))
       else if (past.currentMessage.hasIntent("meow"))
         List(Respond(TextBotResponse(GeneralResponses.meow())))
+      else if (past.currentMessage.hasIntent("fav_thing"))
+        List(Respond(TextBotResponse(GeneralResponses.favThing())))
       else
         List()
     )
