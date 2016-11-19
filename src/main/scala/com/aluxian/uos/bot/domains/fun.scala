@@ -1,15 +1,10 @@
 package com.aluxian.uos.bot.domains
 
-import com.aluxian.uos.bot.{ResponseGenerator, Story}
 import com.aluxian.uos.bot.ai.{BotInterface, BotPast, TextBotResponse}
-import com.aluxian.uos.bot.models._
-import com.github.nscala_time.time.Imports._
-import com.twitter.util.{Future, FuturePool}
 import com.aluxian.uos.bot.models.Phrase._
 import com.aluxian.uos.bot.models._
-import com.aluxian.uos.bot.Story
-
-case class Location(name: String)
+import com.aluxian.uos.bot.{ResponseGenerator, Story}
+import com.twitter.util.Future
 
 object FunResponses extends ResponseGenerator {
   def mum(): String = {
@@ -39,53 +34,54 @@ object FunResponses extends ResponseGenerator {
 }
 
 object FunActions {
-  
+
 }
 
 object FunStory extends Story {
   val phrases = List(
     "Tell my mum I love her!" \\ EntityDef.Intent.GetMum,
     "Can I do it?" \\ EntityDef.Intent.GetYouCanDoIt,
-    "How can I cheat on exams?" \\ EntityDef.Intent.Cheat,
-    "Is Southampton better than Portsmouth?" \\ EntityDef.Intent.Pompey,
-    "What do you think of Solent University?" \\ EntityDef.Intent.Solent,
-    "What is love?" \\ EntityDef.Intent.Love,
-    "Do you like turtles?" \\ EntityDef.Intent.Turtles,
+    "How can I cheat on exams?" \\ EntityDef.Intent.GetCheat,
+    "Is Southampton better than Portsmouth?" \\ EntityDef.Intent.GetPompey,
+    "What do you think of Solent University?" \\ EntityDef.Intent.GetSolent,
+    "What is love?" \\ EntityDef.Intent.GetLove,
+    "Do you like turtles?" \\ EntityDef.Intent.GetTurtles
   )
 
-  def analyse(past: BotPast): Boolean = {
-    past.userAsked(Intent("get_mum")) || 
-    past.userAsked(Intent("get_youcandoit"))  || 
-    past.userAsked(Intent("get_cheat")) || 
-    past.userAsked(Intent("get_pompey")) || 
-    past.userAsked(Intent("get_solent")) || 
-    past.userAsked(Intent("get_love")) || 
-    past.userAsked(Intent("get_turtles")) 
+  def analyse(past: BotPast, bot: BotInterface): Boolean = {
+    past.userAsked(Intent("get_mum")) ||
+      past.userAsked(Intent("get_youcandoit")) ||
+      past.userAsked(Intent("get_cheat")) ||
+      past.userAsked(Intent("get_pompey")) ||
+      past.userAsked(Intent("get_solent")) ||
+      past.userAsked(Intent("get_love")) ||
+      past.userAsked(Intent("get_turtles"))
   }
 
-  def run(past: BotPast, bot: BotInterface): Future[List[BotAction]] = FuturePool.unboundedPool {
+  def run(past: BotPast, bot: BotInterface): Future[List[BotAction]] = {
     val intentOpt = past.currentMessage.intent
     if (intentOpt.isDefined) {
-      val intent = intentOpt.get // Intent("someting")
-      if (intent equals Intent("GetMum")) {
-        return Respond(TextBotResponse(FunResponses.mum()))
-      } else if (intent equals Intent("GetYouCanDoIt")) {
-        return Respond(TextBotResponse(FunResponses.youcandoit()))
-      } else if (intent equals Intent("GetCheat")) {
-        return Respond(TextBotResponse(FunResponses.cheat()))
-      } else if (intent equals Intent("GetPompey")) {
-        return Respond(TextBotResponse(FunResponses.pompey()))
-      } else if (intent equals Intent("GetSolent")) {
-        return Respond(TextBotResponse(FunResponses.solent()))
-      } else if (intent equals Intent("GetLove")) {
-        return Respond(TextBotResponse(FunResfiponses.love()))
-      } else if (intent equals Intent("GetTurtles")) {
-        return Respond(TextBotResponse(FunResponses.turtles()))
+      val intent = intentOpt.get
+      if (intent equals Intent("get_mum")) {
+        return Future(List(Respond(TextBotResponse(FunResponses.mum()))))
+      } else if (intent equals Intent("get_youcandoit")) {
+        return Future(List(Respond(TextBotResponse(FunResponses.youcandoit()))))
+      } else if (intent equals Intent("get_cheat")) {
+        return Future(List(Respond(TextBotResponse(FunResponses.cheat()))))
+      } else if (intent equals Intent("get_pompey")) {
+        return Future(List(Respond(TextBotResponse(FunResponses.pompey()))))
+      } else if (intent equals Intent("get_solent")) {
+        return Future(List(Respond(TextBotResponse(FunResponses.solent()))))
+      } else if (intent equals Intent("get_love")) {
+        return Future(List(Respond(TextBotResponse(FunResponses.love()))))
+      } else if (intent equals Intent("get_turtles")) {
+        return Future(List(Respond(TextBotResponse(FunResponses.turtles()))))
       }
     }
+
     // send messages
-    List[BotAction](
+    Future(List[BotAction](
       Respond(TextBotResponse(FunResponses.sotonrocks()))
-    )
+    ))
   }
 }
