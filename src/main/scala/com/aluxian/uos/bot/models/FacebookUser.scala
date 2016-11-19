@@ -4,5 +4,4 @@ case class FacebookUser(first_name: String,
                         last_name: String,
                         profile_pic: String,
                         gender: String,
-                        locale: String,
-                        timezone: String)
+                        locale: String)

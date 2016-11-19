@@ -15,6 +15,7 @@ libraryDependencies ++= Seq(
   "com.github.nscala-time" %% "nscala-time" % "2.14.0",
   "org.reactivemongo" %% "reactivemongo" % "0.12.0",
   "org.scalaj" %% "scalaj-http" % "2.3.0",
+  "org.slf4j" % "slf4j-simple" % "1.7.5",
   "com.roundeights" %% "hasher" % "1.2.0",
   "io.circe" %% "circe-core" % "0.5.3",
   "io.circe" %% "circe-generic" % "0.5.3",

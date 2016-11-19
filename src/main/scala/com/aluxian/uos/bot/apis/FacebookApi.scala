@@ -21,7 +21,13 @@ object FacebookApi {
       .asString
       .throwError
       .body
-    decode[FacebookUser](userJson).toOption.get
+    println("got user json from fb:" + userJson)
+    println(parse(userJson))
+    val dec = decode[FacebookUser](userJson)
+    if (dec.isLeft) {
+      dec.leftMap(_.printStackTrace())
+    }
+      dec.toOption.get
   }
 
   def post(body: String): Future[Unit] = FuturePool.unboundedPool {
@@ -33,7 +39,6 @@ object FacebookApi {
       .header("User-Agent", Config.userAgent)
       .asString
     println("sent: " + r.body)
-    r.body
   }
 
   def postMessage(addressedFacebookAction: AddressedFacebookAction): Future[Unit] =

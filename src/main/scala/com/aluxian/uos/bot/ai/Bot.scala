@@ -4,22 +4,27 @@ import com.aluxian.uos.bot.Story
 import com.aluxian.uos.bot.apis.WitAiApi
 import com.aluxian.uos.bot.domains.WeatherStory
 import com.aluxian.uos.bot.models.{BotAction, Entity, PastMessage, _}
+import com.aluxian.uos.bot.mongo.MongoMessage
 import com.twitter.util.Future
-import org.joda.time.DateTime
 
 case class WitEntity(name: String, value: String, confidence: Float)
 
-class Bot {
+class Bot(val data: MongoData) {
   def process(text: String, postback: String, entities: List[WitEntity]): Future[List[BotAction]] = {
-    val currentMessagePastMessage = PastMessage(MessageType.Text, CorrespondentType.User, CorrespondentType.Bot,
-      Some(text), convertEntities(entities), DateTime.now)
-    val botPast = new BotPast(List() :+ currentMessagePastMessage)
-    val storyTypeOpt = pickStory(botPast)
-    if (storyTypeOpt.isDefined) {
-      val storyType = storyTypeOpt.get
-      val botMemory = new BotMemory(Map()) // TODO mutable
-      val botInterface = new BotInterface(botMemory)
-      storyType.run(botPast, botInterface)
+
+    println("processing bot")
+    val botPast = new BotPast(messagesToPastMessages(data.messages))
+    val thoughtsMap = data.user.memory
+      .map(mt => (mt.key, Thought(mt.value, mt.expiresAt)))
+      .toMap
+    val botMemory = new BotMemory(thoughtsMap) // TODO mutable
+    val botInterface = new BotInterface(botMemory)
+    val storyPickOpt = pickStory(botPast, botInterface)
+
+    println("storyPickOptDefined? " + storyPickOpt.isDefined)
+    if (storyPickOpt.isDefined) {
+      val story = storyPickOpt.get
+      return story.run(botPast, botInterface)
     }
 
     Future(List())
@@ -27,10 +32,27 @@ class Bot {
 
   case class Result(story: Story, matched: Boolean)
 
-  private def pickStory(botPast: BotPast): Option[Story] = {
-    List(
-      (WeatherStory, WeatherStory.analyse(botPast))
+  private def messagesToPastMessages(messages: List[MongoMessage]): List[PastMessage] = {
+    messages.map {
+      msg =>
+//        println("converting mongo msg to pastMsg, mongomsg= " + msg)
+        PastMessage(
+        MessageType.fromString(msg.`type`),
+        CorrespondentType.fromString(msg.senderType),
+        CorrespondentType.fromString(msg.receiverType),
+        msg.text,
+        msg.entities.map(me => Entity(me.key, me.value)),
+        msg.createdAt
+      )
+    }
+  }
+
+  private def pickStory(botPast: BotPast, botInterface: BotInterface): Option[Story] = {
+    val x = List(
+      (WeatherStory, WeatherStory.analyse(botPast, botInterface))
     )
+    println("pickStory=" + x)
+      x
       .find(_._2)
       .map(_._1)
   }
@@ -40,7 +62,7 @@ class Bot {
   }
 }
 
-class WitBot extends Bot {
+class WitBot(override val data: MongoData) extends Bot(data) {
   def process(text: String, postback: String): Future[List[BotAction]] = {
     if (text.nonEmpty) {
       for {

@@ -1,13 +1,14 @@
 package com.aluxian.uos.bot.domains
 
-import com.aluxian.uos.bot.{ResponseGenerator, Story}
 import com.aluxian.uos.bot.ai.{BotInterface, BotPast, TextBotResponse}
-import com.aluxian.uos.bot.models._
-import com.github.nscala_time.time.Imports._
-import com.twitter.util.{Future, FuturePool}
 import com.aluxian.uos.bot.models.Phrase._
 import com.aluxian.uos.bot.models._
-import com.aluxian.uos.bot.Story
+import com.aluxian.uos.bot.{ResponseGenerator, Story}
+import com.github.nscala_time.time.Imports._
+import com.twitter.util.{Await, Future}
+import io.circe.generic.auto._
+import io.circe.parser._
+import io.circe.syntax._
 
 case class Location(name: String)
 case class Forecast(summary: String, temp: String)
@@ -51,41 +52,60 @@ object WeatherStory extends Story {
     "In Paris" \\ EntityDef.WitLocation("location", "Paris")
   )
 
-  def analyse(past: BotPast): Boolean = {
-    past.userAsked(Intent("get_weather")) ||
+  def analyse(past: BotPast, bot: BotInterface): Boolean = {
+    past.currentMessage.hasIntent("get_weather") ||
       (past.currentMessage.hasEntity("location") && past.botAsked(Intent("get_weather")))
   }
 
-  def run(past: BotPast, bot: BotInterface): Future[List[BotAction]] = FuturePool.unboundedPool {
+  def run(past: BotPast, bot: BotInterface): Future[List[BotAction]] = {
     // get location from the current message
-    if (past.currentMessage.hasEntity("location")) {
-      val locationQuery = past.currentMessage.getEntity("location").value
-      return for {
-        location <- WeatherActions.getLocation(locationQuery)
-        forecast <- WeatherActions.getForecast(location)
-      } yield List(
-        Remember("location", location, 2.hours),
-        Remember("forecast", forecast, 30.minutes),
-        Respond(TextBotResponse(WeatherResponses.forecast(location, forecast)))
-      )
+    if (past.currentMessage.hasIntent("get_weather") && past.currentMessage.hasEntity("location")) {
+      println(">>>> WEATHER STORY match 1")
+      return Future {
+        val locationQuery = past.currentMessage.getEntity("location").value
+        val location = Await.result(WeatherActions.getLocation(locationQuery))
+        val forecast = Await.result(WeatherActions.getForecast(location))
+        List(
+          Remember("location", location.asJson.noSpaces, 2.hours),
+          Remember("forecast", forecast.asJson.noSpaces, 30.minutes),
+          Respond(TextBotResponse(WeatherResponses.forecast(location, forecast)))
+        )
+      }
     }
 
-//    // get location from memory
-//    val locationMemoryOpt = bot.memory.get("location")
-//    if (locationMemoryOpt.isDefined) {
-//      return for {
-//        location <- locationMemoryOpt.map(_.asInstanceOf[Location])
-//        forecast <- WeatherActions.getForecast(location)
-//      } yield List(
-//        Remember("location", location, 2.hours), // reinforce the memory
-//        Remember("forecast", forecast, 30.minutes),
-//        Respond(TextBotResponse(WeatherResponses.forecast(location, forecast)))
-//      )
-//    }
+    // get location from the current message, previous intent
+    if (past.currentMessage.hasEntity("location") && past.botAsked(Intent("get_weather"))) {
+      println(">>>> WEATHER STORY match 2")
+      return Future {
+        val locationQuery = past.currentMessage.getEntity("location").value
+        val location = Await.result(WeatherActions.getLocation(locationQuery))
+        val forecast = Await.result(WeatherActions.getForecast(location))
+        List(
+          Remember("location", location.asJson.noSpaces, 2.hours),
+          Remember("forecast", forecast.asJson.noSpaces, 30.minutes),
+          Respond(TextBotResponse(WeatherResponses.forecast(location, forecast)))
+        )
+      }
+    }
+
+    // get location from memory
+    val locationMemoryOpt = bot.memory.get("location")
+    if (past.currentMessage.hasIntent("get_weather") && locationMemoryOpt.isDefined) {
+      println(">>>> WEATHER STORY match 3")
+      return Future {
+        val location = decode[Location](locationMemoryOpt.get).toOption.get
+        val forecast = Await.result(WeatherActions.getForecast(decode[Location](locationMemoryOpt.get).toOption.get))
+        List(
+          Remember("location", location.asJson.noSpaces, 2.hours), // reinforce the memory
+          Remember("forecast", forecast.asJson.noSpaces, 30.minutes),
+          Respond(TextBotResponse(WeatherResponses.forecast(location, forecast)))
+        )
+      }
+    }
 
     // ask for the location
-    List[BotAction](
-      Respond(TextBotResponse(WeatherResponses.whereLocation()))
-    )
+    Future(List[BotAction](
+      Respond(TextBotResponse(WeatherResponses.whereLocation(), List(Entity("intent", "get_weather"))))
+    ))
   }
 }

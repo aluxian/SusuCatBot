@@ -6,4 +6,4 @@ import org.joda.time.Duration
 sealed abstract class BotAction()
 
 final case class Respond(botResponse: BotResponse) extends BotAction()
-final case class Remember(key: String, value: Any, duration: Duration) extends BotAction()
+final case class Remember(key: String, value: String, duration: Duration) extends BotAction()

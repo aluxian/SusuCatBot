@@ -1,8 +1,10 @@
 package com.aluxian.uos.bot.models
 
+import java.util.Date
+
 import com.github.nscala_time.time.Imports._
 import org.joda.time.DateTime
 
-case class Thought(value: Any, expiresAt: DateTime) {
-  def isExpired: Boolean = DateTime.now > expiresAt
+case class Thought(value: String, expiresAt: Date) {
+  def isExpired: Boolean = DateTime.now > new DateTime(expiresAt)
 }

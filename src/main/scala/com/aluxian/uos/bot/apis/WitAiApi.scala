@@ -14,7 +14,7 @@ object WitAiApi {
   case class WitAiResponse(msg_id: String, _text: String, entities: Map[String, List[Entry]])
 
   def parse(text: String): Future[WitAiResponse] = {
-    require(text.length > 1 && text.length < 256, "text length must be > 0 and < 256")
+    require(text.length > 0 && text.length < 256, "text length must be > 0 and < 256")
     FuturePool.unboundedPool {
       val respJson = Http(Config.witAiApiUrl + "message")
         .param("v", Config.witAiApiVersion)
@@ -24,6 +24,7 @@ object WitAiApi {
         .asString
         .throwError
         .body
+      println("response from wit.ai:" + respJson)
       decode[WitAiResponse](respJson).toOption.get
     }
     //    client

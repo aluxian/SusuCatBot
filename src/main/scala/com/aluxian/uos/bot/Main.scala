@@ -13,7 +13,7 @@ import io.finch.circe._
 import reactivemongo.api.collections.bson._
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
 
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object Main extends TwitterServer {
 
@@ -34,12 +34,13 @@ object Main extends TwitterServer {
     }
 
     // MongoDB connection setup
-    val databaseFuture = for {
-      parsedUri <- Future.fromTry(MongoConnection.parseURI(Config.mongoUrl))
-      conn = new MongoDriver().connection(parsedUri)
-      database <- conn.database(parsedUri.db.get)
-    } yield database
+    val driver = new MongoDriver()
+    val parsedUri = MongoConnection.parseURI(Config.mongoUrl).get // TODO handle exception
+    val connection = driver.connection(parsedUri)
+    val databaseFuture = connection.database(parsedUri.db.get)
+    println(">> awaiting db")
     db = Await.result(databaseFuture.asTwitter)
+    println(">> got db")
 
     // Finagle admin panel
     Await.ready(adminHttpServer)
