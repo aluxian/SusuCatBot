@@ -55,7 +55,6 @@ object FacebookCtrl {
             val messagesQuery = BSONDocument()
             Main.collections.messages.find()
 
-
             val mongoData = MongoData(mongoUser, )
             val witBot = new WitBot()
             val reply = new FacebookReply(sender.id)
