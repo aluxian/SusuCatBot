@@ -18,6 +18,9 @@ object FunResponses extends ResponseGenerator {
   def youcandoit(): String = {
     s"https://www.youtube.com/watch?v=VZ2HcRl4wSk"
   }
+  def cheat(): String = {
+    s"Here is a video for you: https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+  }
   def sotonrocks(): String = {
     s"University of Southampton is the best universtiy ever! Take that Solent!"
   }
@@ -31,10 +34,13 @@ object FunStory extends Story {
   val phrases = List(
     "Tell my mum I love her!" \\ EntityDef.Intent.GetMum,
     "Can I do it?" \\ EntityDef.Intent.GetYouCanDoIt,
+    " How can I cheat on exams?" \\ EntityDef.Intent.Cheat,
   )
 
   def analyse(past: BotPast): Boolean = {
-    past.userAsked(Intent("get_mum")) || past.userAsked(Intent("get_youcandoit"))
+    past.userAsked(Intent("get_mum")) || 
+    past.userAsked(Intent("get_youcandoit"))  || 
+    past.userAsked(Intent("get_cheat"))
   }
 
   def run(past: BotPast, bot: BotInterface): Future[List[BotAction]] = FuturePool.unboundedPool {
@@ -45,6 +51,8 @@ object FunStory extends Story {
         return Respond(TextBotResponse(FunResponses.mum()))
       } else if (intent equals Intent("GetYouCanDoIt")) {
         return Respond(TextBotResponse(FunResponses.youcandoit()))
+      } else if (intent equals Intent("GetCheat")) {
+        return Respond(TextBotResponse(FunResponses.cheat()))
       }
     }
     // send messages
