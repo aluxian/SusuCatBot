@@ -11,7 +11,8 @@ object AroundCampusResponses extends ResponseGenerator {
     "Meow, please be more specific or ask me something else, I'm a cat, not a robot! :o"
   }
   def eat(): String = {
-    "If you were a cat :V, you could eat wherever you want! But, as you are probably human :(, you can eat on campus in Piazza, The Stags, The Bridge, or get a nice sandwich from The Shop!"
+    "If you were a cat :v, you could eat wherever you want! But, as you are probably human :(, you can eat on campus " +
+      "in Piazza, The Stags, The Bridge, or get a nice sandwich from The Shop!"
   }
   def bathroom(): String = {
     "If you are in Mountbatten building, and I know you are since I am a cat :D, its on 4th floor, just outside of the common room on the right!"
@@ -29,7 +30,7 @@ object AroundCampusStory extends Story {
   val phrases = List(
     "Where can I eat on campus?" \\ EntityDef.Intent.GetEat,
     "Where is the nearest bathroom?" \\ EntityDef.Intent.GetBathroom,
-    "Where I can the cheapest pint?" \\ EntityDef.Intent.GetBeer
+    "Where I can get the cheapest pint?" \\ EntityDef.Intent.GetBeer
   )
 
   def analyse(past: BotPast, bot: BotInterface): Boolean = {

@@ -69,7 +69,10 @@ object GeneralStory extends Story {
   def analyse(past: BotPast, bot: BotInterface): Boolean = {
     past.currentMessage.hasIntent("greeting") ||
       past.currentMessage.hasIntent("how_are_you") ||
-      past.currentMessage.hasIntent("thank you")
+      past.currentMessage.hasIntent("thank you") ||
+      past.currentMessage.hasIntent("insult") ||
+      past.currentMessage.hasIntent("meow") ||
+      past.currentMessage.hasIntent("fav_thing")
   }
 
   def run(past: BotPast, bot: BotInterface): Future[List[BotAction]] = {
