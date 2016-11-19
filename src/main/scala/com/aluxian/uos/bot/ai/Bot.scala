@@ -2,7 +2,7 @@ package com.aluxian.uos.bot.ai
 
 import com.aluxian.uos.bot.Story
 import com.aluxian.uos.bot.apis.WitAiApi
-import com.aluxian.uos.bot.domains.{FunStory, WeatherStory}
+import com.aluxian.uos.bot.domains.{AroundCampusStory, FunStory, GeneralStory, WeatherStory}
 import com.aluxian.uos.bot.models.{BotAction, Entity, PastMessage, _}
 import com.aluxian.uos.bot.mongo.MongoMessage
 import com.twitter.util.Future
@@ -36,20 +36,22 @@ class Bot(val data: MongoData) {
     messages.map {
       msg =>
         PastMessage(
-        MessageType.fromString(msg.`type`),
-        CorrespondentType.fromString(msg.senderType),
-        CorrespondentType.fromString(msg.receiverType),
-        msg.text,
-        msg.entities.map(me => Entity(me.key, me.value)),
-        msg.createdAt
-      )
+          MessageType.fromString(msg.`type`),
+          CorrespondentType.fromString(msg.senderType),
+          CorrespondentType.fromString(msg.receiverType),
+          msg.text,
+          msg.entities.map(me => Entity(me.key, me.value)),
+          msg.createdAt
+        )
     }
   }
 
   private def pickStory(botPast: BotPast, botInterface: BotInterface): Option[Story] = {
     List(
       (WeatherStory, WeatherStory.analyse(botPast, botInterface)),
-      (FunStory, FunStory.analyse(botPast, botInterface))
+      (FunStory, FunStory.analyse(botPast, botInterface)),
+      (GeneralStory, GeneralStory.analyse(botPast, botInterface)),
+      (AroundCampusStory, AroundCampusStory.analyse(botPast, botInterface))
     )
       .find(_._2)
       .map(_._1)
