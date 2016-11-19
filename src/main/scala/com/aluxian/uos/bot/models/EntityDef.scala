@@ -11,6 +11,8 @@ object EntityDef {
 
     // intent definitions
     case object GetWeather extends DefType("get_weather")
+    case object GetMum extends DefType("get_mum")
+    case object GetYouCanDoIt extends DefType("get_youcandoit")
   }
 }
 
