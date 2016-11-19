@@ -31,7 +31,7 @@ object WeatherActions {
     * @return a future with the location
     */
   def getLocation(query: String): Future[Location] = {
-    Future(Location("Soton UK"))
+    Future(Location("Southampton UK"))
   }
 
   /**
@@ -41,7 +41,7 @@ object WeatherActions {
     * @return a future with the forecast
     */
   def getForecast(loc: Location): Future[Forecast] = {
-    Future(Forecast("sunny", "12.3"))
+    Future(Forecast("cloudy", "6"))
   }
 }
 
