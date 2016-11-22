@@ -49,7 +49,8 @@ object FunStory extends Story {
     "What do you think of Solent University?" \\ EntityDef.Intent.GetSolent,
     "What is love?" \\ EntityDef.Intent.GetLove,
     "Do you like turtles?" \\ EntityDef.Intent.GetTurtles,
-    "Who's the cutest girl ever?" \\ EntityDef.Intent.GetCutest
+    "Who's the cutest girl ever?" \\ EntityDef.Intent.GetCutest,
+    "Who's the cutest cat?" \\ EntityDef.Intent.GetCutestCat
   )
 
   def analyse(past: BotPast, bot: BotInterface): Boolean = {
@@ -60,7 +61,8 @@ object FunStory extends Story {
       past.userAsked(Intent("get_solent")) ||
       past.userAsked(Intent("get_love")) ||
       past.userAsked(Intent("get_turtles")) ||
-      past.userAsked(Intent("get_cutest"))
+      past.userAsked(Intent("get_cutest")) ||
+      past.userAsked(Intent("get_cutest_cat"))
   }
 
   def run(past: BotPast, bot: BotInterface): Future[List[BotAction]] = {
@@ -81,8 +83,10 @@ object FunStory extends Story {
         return Future(List(Respond(TextBotResponse(FunResponses.love()))))
       } else if (intent equals Intent("get_turtles")) {
         return Future(List(Respond(TextBotResponse(FunResponses.turtles()))))
-      } else if (intent equals Intent("get_cutest")) {
-        return Future(List(Respond(TextBotResponse(FunResponses.cutest()))))
+//      } else if (intent equals Intent("get_cutest")) {
+//        return Future(List(Respond(TextBotResponse(FunResponses.cutest()))))
+//      } else if (intent equals Intent("get_cutest_cat")) {
+//        return Future(List(Respond(TextBotResponse("You are the cutest cat, Anastasia <3"))))
       }
     }
 
