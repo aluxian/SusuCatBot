@@ -1,4 +1,4 @@
-name := "uos-bot"
+name := "susucatbot"
 
 version := "0.4.0"
 
